@@ -212,11 +212,31 @@ apt-mark hold moloch
 ### END Moloch set up
 
 ### START Setup Bro ###
+
+# Set the capabilities of Bro
+setcap cap_net_raw,cap_net_admin=eip /usr/bin/bro
+setcap cap_net_raw,cap_net_admin=eip /usr/bin/capstats
+
+# Update the log directory permissions
+chown -R logstash:logstash /var/log/bro/
+chown -R logstash:logstash /var/spool/bro/
+
+# Backup the current configuration files
+mkdir -p /usr/src/bro-backup/{etc,usr/share}
+cp -r /usr/share/bro /usr/src/bro-backup/usr/share
+cp -r /usr/share/broctl /usr/src/bro-backup/usr/share
+cp -r /etc/bro /usr/src/bro-backup/etc
+cp -r /etc/logstash /usr/src/bro-backup/etc
+
 cd /usr/src/
-git clone https://github.com/Jeroen0494/Bro.git && \
-	cd Bro
-chmod +x install-bro-scripts.sh
-/usr/src/Bro/install-bro-scripts.sh
+git clone https://github.com/Jeroen0494/Bro.git
+cd Bro/staging
+
+# Copy the files into place
+find etc -type d -exec mkdir -p /'{}' \;
+find usr -type d -exec mkdir -p /'{}' \;
+find etc -type f -exec cp -r --backup=numbered '{}' /'{}' \;
+find usr -type f -exec cp -r --backup=numbered '{}' /'{}' \;
 
 ### END Setup Bro ###
 
@@ -228,7 +248,7 @@ apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--fo
 
 
 # Set up a curator old logs removal
-# flush everything that is older than 2 weeks
+# flush everything that is older than 30 days
 
 cat >> /opt/selks/delete-old-logs.sh <<EOF
 #!/bin/bash
@@ -241,7 +261,7 @@ cat >> /opt/selks/delete-old-logs.sh <<EOF
     "source": "creation_date",
     "direction": "older",
     "unit": "days",
-    "unit_count": 14
+    "unit_count": 30
   },
   {
     "filtertype": "pattern",

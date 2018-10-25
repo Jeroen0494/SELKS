@@ -63,6 +63,7 @@ EOF
 
 GUI=
 KERNEL_VER=
+NL_MIRROR=http://mirror.nl.leaseweb.net/
 
 while getopts “hg:k:p:” OPTION
 do
@@ -187,14 +188,12 @@ then
   --linux-packages linux-image-${KERNEL_VER} \
   --linux-packages linux-headers-${KERNEL_VER} \
   --apt-options "--yes --force-yes" \
+  --mirror-binary ${NL_MIRROR}debian/ \
   --linux-flavour stamus \
   --iso-application SELKS - Suricata Elasticsearch Logstash Kibana Scirius \
   --iso-preparer Stamus Networks \
   --iso-publisher Stamus Networks \
   --iso-volume Stamus-SELKS $LB_CONFIG_OPTIONS
-  --mirror-binary http://mirror.nl.leaseweb.net/debian/
-  --mirror-binary-security http://mirror.nl.leaseweb.net/debian-security/
-  --mirror-binary-backports http://mirror.nl.leaseweb.net/debian-backports/
   
 else
 
@@ -204,13 +203,11 @@ else
   --swap-file-size 2048 \
   --debian-installer live \
   --bootappend-live "boot=live swap config username=selks-user live-config.hostname=SELKS live-config.user-default-groups=audio,cdrom,floppy,video,dip,plugdev,scanner,bluetooth,netdev,sudo" \
+  --mirror-binary ${NL_MIRROR}debian/ \
   --iso-application SELKS - Suricata Elasticsearch Logstash Kibana Scirius \
   --iso-preparer Stamus Networks \
   --iso-publisher Stamus Networks \
   --iso-volume Stamus-SELKS $LB_CONFIG_OPTIONS 
-  --mirror-binary http://mirror.nl.leaseweb.net/debian/
-  --mirror-binary-security http://mirror.nl.leaseweb.net/debian-security/
-  --mirror-binary-backports http://mirror.nl.leaseweb.net/debian-backports/
 
 # If needed a "live" kernel can be specified like so.
 # In SELKS 4 as it uses kernel >4.9 we make sure we keep the "old/unpredictable" naming convention 
