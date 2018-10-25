@@ -192,6 +192,9 @@ then
   --iso-preparer Stamus Networks \
   --iso-publisher Stamus Networks \
   --iso-volume Stamus-SELKS $LB_CONFIG_OPTIONS
+  --mirror-binary http://mirror.nl.leaseweb.net/debian/
+  --mirror-binary-security http://mirror.nl.leaseweb.net/debian-security/
+  --mirror-binary-backports http://mirror.nl.leaseweb.net/debian-backports/
   
 else
 
@@ -205,6 +208,9 @@ else
   --iso-preparer Stamus Networks \
   --iso-publisher Stamus Networks \
   --iso-volume Stamus-SELKS $LB_CONFIG_OPTIONS 
+  --mirror-binary http://mirror.nl.leaseweb.net/debian/
+  --mirror-binary-security http://mirror.nl.leaseweb.net/debian-security/
+  --mirror-binary-backports http://mirror.nl.leaseweb.net/debian-backports/
 
 # If needed a "live" kernel can be specified like so.
 # In SELKS 4 as it uses kernel >4.9 we make sure we keep the "old/unpredictable" naming convention 
@@ -339,6 +345,10 @@ echo "
 ethtool bwm-ng iptraf htop rsync tcpreplay sysstat hping3 screen ngrep 
 tcpflow dsniff mc python-daemon wget curl vim bootlogd lsof libpolkit-agent-1-0 libpolkit-backend-1-0 libpolkit-gobject-1-0 policykit-1" \
 >> Stamus-Live-Build/config/package-lists/StamusNetworks-Tools.list.chroot
+
+# Add additional Quintor specific packages to be installed
+echo "bro broctl nmap syslog-ng" \
+>> Stamus-Live-Build/config/package-lists/Quintor-Tools.list.chroot
 
 # Unless otherwise specified the ISO will be with a Desktop Environment
 if [[ -z "$GUI" ]]; then 

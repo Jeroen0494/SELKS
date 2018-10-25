@@ -9,7 +9,7 @@
 set -ex
 
 # Setting up the LIVE root (during install on disk it is preseeded)
-echo "root:StamusNetworks" | chpasswd
+echo "root:Quintor" | chpasswd
 
 # Enable color output and the "ll" command in shell 
 echo " export LS_OPTIONS='--color=auto'" >> /root/.bashrc
@@ -34,7 +34,7 @@ deb http://files.evebox.org/evebox/debian stable main
 EOF
 
 cat >> /etc/apt/sources.list.d/selks5.list <<EOF
-# SELKS4 Stamus Networks repos
+# SELKS5 Stamus Networks repos
 #
 # Manual changes here can be overwritten during 
 # SELKS updates and upgrades !!
@@ -115,10 +115,10 @@ ln -s /usr/share/doc/scirius/examples/scirius-supervisor.conf /etc/supervisor/co
 chown -R logstash:logstash /var/log/suricata
 
 # www-data needs to write Suricata rules
-chown -R www-data.www-data /etc/suricata/rules/
+chown -R www-data:www-data /etc/suricata/rules/
 
 mkdir -p /etc/nginx/ssl
-openssl req -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Paris/O=Stamus/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca 
+openssl req -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Groningen/O=Quintor/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca 
 
 rm -rf /etc/nginx/sites-enabled/default
 
@@ -186,7 +186,7 @@ touch /var/log/scirius-error.log
 chown www-data /var/log/scirius*
 chown -R www-data /var/lib/scirius/git-sources/
 chown -R www-data /var/lib/scirius/db/
-chown -R www-data.www-data /etc/suricata/rules/
+chown -R www-data:www-data /etc/suricata/rules/
 
 # fix permissions for user www-data/scirius
 usermod -a -G logstash www-data
@@ -210,6 +210,15 @@ rm /opt/molochtmp -r
 apt-mark hold moloch
 
 ### END Moloch set up
+
+### START Setup Bro ###
+cd /usr/src/
+git clone https://github.com/Jeroen0494/Bro.git && \
+	cd Bro
+chmod +x install-bro-scripts.sh
+/usr/src/Bro/install-bro-scripts.sh
+
+### END Setup Bro ###
 
 ### START Install SELKS/StamusN scripts ###
 
