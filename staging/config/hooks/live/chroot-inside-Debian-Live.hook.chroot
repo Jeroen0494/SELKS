@@ -77,7 +77,7 @@ chown logstash:logstash /var/cache/logstash/sincedbs/
 apt-get update && \
 apt-get install -y -o Dpkg::Options::="--force-confdef" suricata 
 #make sure Suricata can write in /data/nsm
-chown logstash -R /data/nsm/
+chown logstash:logstash -R /data/nsm/
 
 ### END Suricata ###
 
@@ -217,10 +217,6 @@ apt-mark hold moloch
 setcap cap_net_raw,cap_net_admin=eip /usr/bin/bro
 setcap cap_net_raw,cap_net_admin=eip /usr/bin/capstats
 
-# Update the log directory permissions
-chown -R logstash:logstash /var/log/bro/
-chown -R logstash:logstash /var/spool/bro/
-
 # Backup the current configuration files
 mkdir -p /usr/src/bro-backup/{etc,usr/share}
 cp -r /usr/share/bro /usr/src/bro-backup/usr/share
@@ -235,8 +231,21 @@ cd Bro/staging
 # Copy the files into place
 find etc -type d -exec mkdir -p /'{}' \;
 find usr -type d -exec mkdir -p /'{}' \;
+find var -type d -exec mkdir -p /'{}' \;
 find etc -type f -exec cp -r --backup=numbered '{}' /'{}' \;
 find usr -type f -exec cp -r --backup=numbered '{}' /'{}' \;
+find var -type f -exec cp -r --backup=numbered '{}' /'{}' \;
+
+# Update the log directory permissions
+chown -R logstash:logstash /var/log/bro/
+chown -R logstash:logstash /var/spool/bro/
+
+# Install the configuration files
+sudo -u logstash /usr/bin/broctl install
+
+# Enable the service
+/bin/systemctl daemon-reload
+/bin/systemctl enable bro.service
 
 ### END Setup Bro ###
 
@@ -281,7 +290,7 @@ echo "0 4 * * * root /opt/selks/delete-old-logs.sh" >> /etc/crontab
 # always leave a empty line before cron files end
 echo "" >> /etc/crontab
 
-# Set up the host name
+# Setup the hostname
 echo "SELKS" > /etc/hostname
 
 # Enable the ssh banners

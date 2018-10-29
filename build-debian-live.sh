@@ -184,7 +184,7 @@ then
   --swap-file-size 2048 \
   --bootloader syslinux \
   --debian-installer live \
-  --bootappend-live "boot=live swap config username=selks-user live-config.hostname=SELKS live-config.user-default-groups=audio,cdrom,floppy,video,dip,plugdev,scanner,bluetooth,netdev,sudo" \
+  --bootappend-live "boot=live swap config username=selks-user live-config.hostname=SELKS live-config.user-default-groups=audio,cdrom,floppy,video,dip,plugdev,scanner,bluetooth,netdev,sudo,wireshark" \
   --linux-packages linux-image-${KERNEL_VER} \
   --linux-packages linux-headers-${KERNEL_VER} \
   --apt-options "--yes --force-yes" \
@@ -202,7 +202,7 @@ else
   --archive-areas "main contrib" \
   --swap-file-size 2048 \
   --debian-installer live \
-  --bootappend-live "boot=live swap config username=selks-user live-config.hostname=SELKS live-config.user-default-groups=audio,cdrom,floppy,video,dip,plugdev,scanner,bluetooth,netdev,sudo" \
+  --bootappend-live "boot=live swap config username=selks-user live-config.hostname=SELKS live-config.user-default-groups=audio,cdrom,floppy,video,dip,plugdev,scanner,bluetooth,netdev,sudo,wireshark" \
   --mirror-binary ${NL_MIRROR}debian/ \
   --iso-application SELKS - Suricata Elasticsearch Logstash Kibana Scirius \
   --iso-preparer Stamus Networks \
@@ -403,16 +403,25 @@ fi
 
 # Debian installer preseed.cfg
 echo "
+d-i debian-installer/language string en
+d-i debian-installer/country string NL
+d-i debian-installer/locale string en_US.UTF-8
+d-i debian-installer/supported-locales multiselect en_US.UTF-8, nl_NL.UTF-8
+
+d-i mirror/country string manual
+d-i mirror/http/hostname string mirror.nl.leaseweb.net
+d-i mirror/http/directory string /debian
+
 d-i netcfg/hostname string SELKS
 
 d-i passwd/user-fullname string selks-user User
 d-i passwd/username string selks-user
 d-i passwd/user-password password selks-user
 d-i passwd/user-password-again password selks-user
-d-i passwd/user-default-groups string audio cdrom floppy video dip plugdev scanner bluetooth netdev sudo
+d-i passwd/user-default-groups string audio cdrom floppy video dip plugdev scanner bluetooth netdev sudo wireshark
 
-d-i passwd/root-password password StamusNetworks
-d-i passwd/root-password-again password StamusNetworks
+d-i passwd/root-password password Quintor
+d-i passwd/root-password-again password Quintor
 " > Stamus-Live-Build/config/includes.installer/preseed.cfg
 
 # Build the ISO
