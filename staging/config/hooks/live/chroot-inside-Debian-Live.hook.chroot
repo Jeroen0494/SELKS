@@ -63,7 +63,7 @@ apt-get install -y elasticsearch logstash kibana elasticsearch-curator
 
 mkdir -p /var/cache/logstash/sincedbs/
 chown logstash:logstash /var/cache/logstash/sincedbs/
-/usr/share/logstash/bin/logstash-plugin install logstash-filter-geoip
+/usr/share/logstash/bin/logstash-plugin install logstash-filter-geoip logstash-filter-tld logstash-filter-rest
 
 /bin/systemctl enable elasticsearch && \
 /bin/systemctl enable logstash && \
@@ -118,7 +118,7 @@ chown -R logstash:logstash /var/log/suricata
 chown -R www-data:www-data /etc/suricata/rules/
 
 mkdir -p /etc/nginx/ssl
-openssl req -new -nodes -x509 -subj "/C=FR/ST=IDF/L=Groningen/O=Quintor/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca 
+openssl req -new -nodes -x509 -subj "/C=NL/ST=Groningen/L=Groningen/O=Quintor/CN=SELKS" -days 3650 -keyout /etc/nginx/ssl/scirius.key -out /etc/nginx/ssl/scirius.crt -extensions v3_ca 
 
 rm -rf /etc/nginx/sites-enabled/default
 
@@ -244,10 +244,27 @@ chown -R logstash:logstash /var/spool/bro/
 sudo -u logstash /usr/bin/broctl install
 
 # Enable the service
-/bin/systemctl daemon-reload
 /bin/systemctl enable bro.service
+/bin/systemctl daemon-reload
 
 ### END Setup Bro ###
+
+## START Setup Kibana Bro Dashboards ###
+cd /usr/src/Bro/kibana/
+
+function get_name()
+{
+    basename "$1" .json | sed -e 's/ /%20/g'
+}
+
+for file in ./*.json
+do
+    name="$(get_name "$file")"
+    echo "Loading dashboard $name:"
+    $CURL -H "Content-Type: application/json" -XPUT "http://127.0.0.1:9200/.kibana/doc/$name" \
+        -d "@$file" || exit 1
+    echo
+done
 
 ### START Install SELKS/StamusN scripts ###
 
