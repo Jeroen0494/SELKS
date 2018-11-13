@@ -252,17 +252,11 @@ sudo -u logstash /usr/bin/broctl install
 ## START Setup Kibana Bro Dashboards ###
 cd /usr/src/Bro/kibana/
 
-function get_name()
-{
-    basename "$1" .json | sed -e 's/ /%20/g'
-}
-
-for file in ./*.json
+for file in *.json
 do
-    name="$(get_name "$file")"
-    echo "Loading dashboard $name:"
-    $CURL -H "Content-Type: application/json" -XPUT "http://127.0.0.1:9200/.kibana/doc/$name" \
-        -d "@$file" || exit 1
+    echo "Loading dashboard $file:"
+    $CURL -XPOST localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
+        || exit 1
     echo
 done
 
