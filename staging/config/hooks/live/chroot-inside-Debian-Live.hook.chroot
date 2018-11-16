@@ -255,15 +255,15 @@ sudo -u logstash /usr/bin/broctl install
 # Clone the git repo containing Logstash and Kibana configuration files. Pull from remote for updates.
 cd /usr/src/
 git clone https://github.com/Jeroen0494/securityonion-elastic.git
-cd securityonion-elastic
+cd /usr/src/securityonion-elastic
 git checkout Quintor
 
 # Copy configuration files into place
-cp -r --backup=numbered /usr/src/securityonion-elastic/configfiles/ /etc/logstash/conf.d/
+cp -r --backup=numbered --update /usr/src/securityonion-elastic/configfiles/* /etc/logstash/conf.d/
 
 mkdir -p /etc/syslog-ng/conf.d/
-cp -r --backup=numbered /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/conf.d/metrics-template.json
-cp -r --backup=numbered /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
+cp --backup=numbered --update /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/metrics-template.json
+cp --backup=numbered --update /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
 
 
 # Patch Logstash configuration files
@@ -283,7 +283,7 @@ patch -b logstash.conf /usr/src/securityonion-elastic/Quintor-patches/logstash.c
 
 # Patch Kibana dashboards
 cd /usr/src/securityonion-elastic/
-cp -r --backup=numbered kibana kibana-Quintor
+cp -r --backup=numbered --no-target-directory --update kibana kibana-Quintor
 cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards
 patch -b < /usr/src/securityonion-elastic/Quintor-patches/kibana-dashboards.patch
 
