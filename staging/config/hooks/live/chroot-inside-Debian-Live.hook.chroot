@@ -297,7 +297,7 @@ cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards/
 for file in *.json
 do
     echo "Loading dashboard $file:"
-    $CURL -XPOST localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
+    curl -XPOST localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
         || exit 1
     echo
 done
