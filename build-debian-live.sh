@@ -320,6 +320,12 @@ cp staging/usr/share/applications/Upgrade-SELKS.desktop Stamus-Live-Build/config
 # Same as above but for root
 cp staging/usr/share/applications/Upgrade-SELKS.desktop Stamus-Live-Build/config/includes.chroot/root/Desktop/
 
+# Copy Quintor first time set up desktop shortcut.
+cp staging/usr/share/applications/FirstTime-Setup-Quintor.desktop Stamus-Live-Build/config/includes.chroot/etc/skel/Desktop/
+
+# Same as above but for root
+cp staging/usr/share/applications/FirstTime-Setup-Quintor.desktop Stamus-Live-Build/config/includes.chroot/root/Desktop/
+
 
 # Add core system packages to be installed
 echo "

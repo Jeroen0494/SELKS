@@ -193,7 +193,7 @@ usermod -a -G logstash www-data
 mkdir -p /var/run/suricata/
 chmod g+w /var/run/suricata/ -R
 
-### END Scirius, nginx, revrse proxy, supervisor and ssl ###
+### END Scirius, nginx, reverse proxy, supervisor and ssl ###
 
 ### START Moloch set up 
 
@@ -291,19 +291,27 @@ patch -b < /usr/src/securityonion-elastic/Quintor-patches/kibana-dashboards.patc
 # Patch syslog-ng
 patch -b /etc/syslog-ng/conf.d/01-bro.conf /usr/src/securityonion-elastic/Quintor-patches/syslog-ng.conf.patch
 
+# Setup permissions
+chown -R logstash:logstash /etc/logstash
 
-# Import Kibana dashboards
+# Create a first-time-setup script
+mkdir -p /opt/Quintor/
+cat >> /opt/Quintor/first-time-setup.sh <<EOF
+#!/bin/bash
+
+set -ex
+
 cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards/
 for file in *.json
 do
     echo "Loading dashboard $file:"
-    curl -XPOST localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
+    curl -XPOST http://localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
         || exit 1
     echo
 done
+EOF
 
-# Setup permissions
-chown -R logstash:logstash /etc/logstash
+chmod 755 /opt/Quintor/first-time-setup.sh
 
 ### END Setup Security Onion Logstash, Kibana and Bro setup ###
 
@@ -329,7 +337,7 @@ cat >> /opt/selks/delete-old-logs.sh <<EOF
     "source": "creation_date",
     "direction": "older",
     "unit": "days",
-    "unit_count": 30
+    "unit_count": 14
   },
   {
     "filtertype": "pattern",

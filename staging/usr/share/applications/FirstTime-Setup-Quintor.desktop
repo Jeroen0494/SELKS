@@ -1,0 +1,12 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Name=FirstTime-Setup-Quintor.desktop
+Icon=system
+Comment=Setup Bro Kibana Dashboards
+Exec=/usr/bin/pkexec "/opt/Quintor/first-time-setup.sh" "$@"
+Type=Application
+Categories=Application;System;
+StartupNotify=true
+Terminal=true
+X-KeepTerminal=true
