@@ -1,0 +1,6 @@
+# Allow all users in the sudo group to run the Quintor setup script
+polkit.addRule(function(action, subject) {
+	    if ((action.id == "org.freedesktop.policykit.pkexec.run-quintorfirsttimesetup" && subject.isInGroup("sudo")) {
+            return polkit.Result.YES;
+    }
+});
