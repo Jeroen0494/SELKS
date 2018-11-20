@@ -296,7 +296,7 @@ chown -R logstash:logstash /etc/logstash
 
 # Create a first-time-setup script
 mkdir -p /opt/Quintor/
-cat >> /opt/Quintor/first-time-setup.sh <<EOF
+cat >> /opt/Quintor/first-time-setup.sh <<'EOF'
 #!/bin/bash
 
 set -ex
