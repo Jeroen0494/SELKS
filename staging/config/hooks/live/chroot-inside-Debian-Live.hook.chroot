@@ -63,7 +63,11 @@ apt-get install -y elasticsearch logstash kibana elasticsearch-curator
 
 mkdir -p /var/cache/logstash/sincedbs/
 chown logstash:logstash /var/cache/logstash/sincedbs/
-/usr/share/logstash/bin/logstash-plugin install logstash-filter-geoip logstash-filter-tld logstash-filter-rest
+/usr/share/logstash/bin/logstash-plugin install logstash-filter-geoip
+/usr/share/logstash/bin/logstash-plugin install logstash-filter-tld
+/usr/share/logstash/bin/logstash-plugin install logstash-filter-rest
+/usr/share/logstash/bin/logstash-plugin install logstash-filter-translate
+/usr/share/logstash/bin/logstash-plugin install logstash-filter-elasticsearch
 
 /bin/systemctl enable elasticsearch && \
 /bin/systemctl enable logstash && \
@@ -244,8 +248,9 @@ chown -R logstash:logstash /var/spool/bro/
 sudo -u logstash /usr/bin/broctl install
 
 # Enable the service
-/bin/systemctl enable bro.service
 /bin/systemctl daemon-reload
+/bin/systemctl enable bro.service
+
 
 ### END Setup Bro ###
 
@@ -264,6 +269,17 @@ cp -r --backup=numbered --update /usr/src/securityonion-elastic/configfiles/* /e
 mkdir -p /etc/syslog-ng/conf.d/
 cp --backup=numbered --update /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/metrics-template.json
 cp --backup=numbered --update /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
+
+mkdir /opt/freq
+cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8502_postprocess_freq_analysis_bro_dns.conf /etc/logstash/conf.d/
+cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8503_postprocess_freq_analysis_bro_http.conf /etc/logstash/conf.d/
+cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8504_postprocess_freq_analysis_bro_ssl.conf /etc/logstash/conf.d/
+cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8505_postprocess_freq_analysis_bro_x509.conf /etc/logstash/conf.d/
+cp -r --backup=numbered --no-target-directory --update /usr/src/securityonion-elastic/configfiles-setup_required/freq/ /opt/freq/
+chmod 755 /opt/freq/freq.sh
+cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-dns.service /etc/systemd/system/
+cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-http.service /etc/systemd/system/
+rm /opt/freq/freq
 
 
 # Patch Logstash configuration files
@@ -312,6 +328,11 @@ done
 EOF
 
 chmod 755 /opt/Quintor/first-time-setup.sh
+
+# Setup a frequency server. The files have already been copied into place, enable the service.
+/bin/systemctl daemon-reload
+/bin/systemctl enable freq-dns.service
+/bin/systemctl enable freq-http.service
 
 ### END Setup Security Onion Logstash, Kibana and Bro setup ###
 
