@@ -315,8 +315,9 @@ mkdir -p /opt/Quintor/
 cat >> /opt/Quintor/first-time-setup.sh <<'EOF'
 #!/bin/bash
 
-set -ex
+set -e
 
+# Import Security Onion Dashboards
 cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards/
 for file in *.json
 do
@@ -325,6 +326,10 @@ do
         || exit 1
     echo
 done
+
+# Set the default index pattern to "logstash-*"
+curl -XPOST -H "Content-Type: application/json" -H "kbn-xsrf: true" localhost:5601/api/kibana/settings/defaultIndex -d '{"value": "logstash-*"}'
+
 EOF
 
 chmod 755 /opt/Quintor/first-time-setup.sh

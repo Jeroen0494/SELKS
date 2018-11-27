@@ -413,6 +413,7 @@ d-i debian-installer/language string en
 d-i debian-installer/country string NL
 d-i debian-installer/locale string en_US.UTF-8
 d-i debian-installer/supported-locales multiselect en_US.UTF-8, nl_NL.UTF-8
+d-i debian-installer/xkb-keymap select us
 
 d-i mirror/country string manual
 d-i mirror/http/hostname string mirror.nl.leaseweb.net
