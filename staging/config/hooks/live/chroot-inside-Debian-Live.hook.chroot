@@ -317,18 +317,33 @@ cat >> /opt/Quintor/first-time-setup.sh <<'EOF'
 
 set -e
 
-# Import Security Onion Dashboards
-cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards/
-for file in *.json
-do
-    echo "Loading dashboard $file:"
-    curl -XPOST http://localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
-        || exit 1
-    echo
-done
+echo -e "WARNING! Running this script will delete all "metrics-*" indices, along with their data. Do you wish to continue? (N/y)"
+read DEL
+if [[ ${DEL} == [Yy]* ]]; then
 
-# Set the default index pattern to "logstash-*"
-curl -XPOST -H "Content-Type: application/json" -H "kbn-xsrf: true" localhost:5601/api/kibana/settings/defaultIndex -d '{"value": "logstash-*"}'
+    # Import Security Onion Dashboards
+    cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards/
+    for file in *.json
+    do
+        echo "Loading dashboard $file:"
+        curl -XPOST http://localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
+            || exit 1
+        echo
+    done
+
+    # Set the default index pattern to "logstash-*"
+    echo "Setting the default index pattern to logstash-*"
+    curl -XPOST -H "Content-Type: application/json" -H "kbn-xsrf: true" localhost:5601/api/kibana/settings/defaultIndex -d '{"value": "logstash-*"}'
+
+    # Remove indices and restart logstash
+    echo "Removing indices and restarting logstash"
+    systemctl stop logstash
+    curl -X DELETE "localhost:9200/metrics-*"
+    systemctl start logstash
+else
+    echo -e "\n Exiting...
+    exit 0
+fi
 
 EOF
 
