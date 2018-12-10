@@ -326,7 +326,7 @@ if [[ ${DEL} == [Yy]* ]]; then
     for file in *.json
     do
         echo "Loading dashboard $file:"
-        curl -XPOST http://localhost:5601/api/kibana/dashboards/import -H 'kbn-xsrf:true' -H 'Content-Type: application/json' -d @./$file \
+        curl -XPOST localhost:5601/api/kibana/dashboards/import?force=true -H 'kbn-xsrf:true' -H 'Content-type:application/json' -d @./$file \
             || exit 1
         echo
     done
