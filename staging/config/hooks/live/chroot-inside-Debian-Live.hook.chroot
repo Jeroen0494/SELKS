@@ -264,21 +264,21 @@ cd /usr/src/securityonion-elastic
 git checkout Quintor
 
 # Copy configuration files into place
-cp -r --backup=numbered --update /usr/src/securityonion-elastic/configfiles/* /etc/logstash/conf.d/
+cp -r --backup=numbered /usr/src/securityonion-elastic/configfiles/* /etc/logstash/conf.d/
 
 mkdir -p /etc/syslog-ng/conf.d/
-cp --backup=numbered --update /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/metrics-template.json
-cp --backup=numbered --update /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
+cp --backup=numbered /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/metrics-template.json
+cp --backup=numbered /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
 
 mkdir /opt/freq
-cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8502_postprocess_freq_analysis_bro_dns.conf /etc/logstash/conf.d/
-cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8503_postprocess_freq_analysis_bro_http.conf /etc/logstash/conf.d/
-cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8504_postprocess_freq_analysis_bro_ssl.conf /etc/logstash/conf.d/
-cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/8505_postprocess_freq_analysis_bro_x509.conf /etc/logstash/conf.d/
-cp -r --backup=numbered --no-target-directory --update /usr/src/securityonion-elastic/configfiles-setup_required/freq/ /opt/freq/
+cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8502_postprocess_freq_analysis_bro_dns.conf /etc/logstash/conf.d/
+cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8503_postprocess_freq_analysis_bro_http.conf /etc/logstash/conf.d/
+cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8504_postprocess_freq_analysis_bro_ssl.conf /etc/logstash/conf.d/
+cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8505_postprocess_freq_analysis_bro_x509.conf /etc/logstash/conf.d/
+cp -r --backup=numbered --no-target-directory /usr/src/securityonion-elastic/configfiles-setup_required/freq/ /opt/freq/
 chmod 755 /opt/freq/freq.sh
-cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-dns.service /etc/systemd/system/
-cp --backup=numbered --update /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-http.service /etc/systemd/system/
+cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-dns.service /etc/systemd/system/
+cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-http.service /etc/systemd/system/
 rm /opt/freq/freq
 
 
@@ -299,7 +299,8 @@ patch -b logstash.conf /usr/src/securityonion-elastic/Quintor-patches/logstash.c
 
 # Patch Kibana dashboards
 cd /usr/src/securityonion-elastic/
-cp -r --backup=numbered --no-target-directory --update kibana kibana-Quintor
+[ -d "kibana-Quintor" ] && rm -rf /usr/src/securityonion-elastic/kibana-Quintor
+cp -r --no-target-directory kibana kibana-Quintor
 cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards
 patch -b < /usr/src/securityonion-elastic/Quintor-patches/kibana-dashboards.patch
 
@@ -340,6 +341,9 @@ if [[ ${DEL} == [Yy]* ]]; then
     systemctl stop logstash
     curl -X DELETE "localhost:9200/metrics-*"
     systemctl start logstash
+    
+    # Setup Kibana logging and enable logrotate
+    
 else
     echo -e "\n Exiting...
     exit 0
@@ -348,6 +352,27 @@ fi
 EOF
 
 chmod 755 /opt/Quintor/first-time-setup.sh
+
+# Enable Kibana logging
+sed -i "s/.*logging\.dest\: .*/logging\.dest\: \/var\/log\/kibana\/kibana\.log/g" /etc/kibana/kibana.yml
+mkdir -p /var/log/kibana/
+chmod -R kibana: /var/log/kibana/
+
+# Setup logrotate for Kibana
+cat > "/etc/logrotate.d/kibana" << EOF
+/var/log/kibana/*.log {
+    daily
+    rotate 7
+    copytruncate
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /usr/bin/pkill -HUP -f /usr/share/kibana/bin/../node/bin/node
+    endscript
+}
+EOF
 
 # Setup a frequency server. The files have already been copied into place, enable the service.
 /bin/systemctl daemon-reload
