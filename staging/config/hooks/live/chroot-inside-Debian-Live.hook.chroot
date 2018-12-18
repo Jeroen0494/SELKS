@@ -345,7 +345,7 @@ if [[ ${DEL} == [Yy]* ]]; then
     # Setup Kibana logging and enable logrotate
     
 else
-    echo -e "\n Exiting...
+    echo -e "\n Exiting..."
     exit 0
 fi
 
