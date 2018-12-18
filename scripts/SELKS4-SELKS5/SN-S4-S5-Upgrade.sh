@@ -620,14 +620,14 @@ curl -X POST "localhost:9200/_aliases" -H 'Content-Type: application/json' -d'
 '
 
 # Install elasticsearch-curator
-apt-get update && install -y elasticsearch-curator
+apt-get update && apt-get -y install elasticsearch-curator
 
 # Install Moloch
 mkdir -p /opt/molochtmp
 cd /opt/molochtmp/ && \
-apt-get install -y libjson-perl libyaml-dev libcrypto++6
-wget https://files.molo.ch/builds/ubuntu-18.04/moloch_1.6.1-1_amd64.deb
-dpkg -i moloch_1.6.1-1_amd64.deb
+apt-get -y install libjson-perl libyaml-dev libcrypto++6
+wget https://files.molo.ch/builds/ubuntu-18.04/moloch_1.6.2-1_amd64.deb
+dpkg -i moloch_1.6.2-1_amd64.deb
 
 
 cd /opt/
@@ -640,10 +640,12 @@ apt-mark hold moloch
 # Set up a daily clean up cron job for Moloch
 echo "0 3 * * * root ( /data/moloch/db/db.pl http://127.0.0.1:9200 expire daily 14 )" >> /etc/crontab
 
-/opt/selks/Scripts/Setup/selks-molochdb-init-setup_stamus.sh
+/usr/bin/selks-molochdb-init-setup_stamus.sh
 # systemctl status suricata elasticsearch logstash kibana evebox molochviewer-selks molochpcapread-selks
 
-# reset and reload the new KTS6 dashboards
+# reset and reload the new KTS6 dashboards and Kibana indexes
+curl -XDELETE 'http://localhost:9200/.kibana*'
+/bin/systemctl restart kibana && sleep 20
 cd /usr/share/python/scirius/ && . bin/activate && python bin/manage.py kibana_reset && deactivate && cd /opt 
 
 
