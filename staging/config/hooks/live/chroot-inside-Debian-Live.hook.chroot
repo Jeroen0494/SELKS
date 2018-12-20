@@ -356,7 +356,7 @@ chmod 755 /opt/Quintor/first-time-setup.sh
 # Enable Kibana logging
 sed -i "s/.*logging\.dest\: .*/logging\.dest\: \/var\/log\/kibana\/kibana\.log/g" /etc/kibana/kibana.yml
 mkdir -p /var/log/kibana/
-chmod -R kibana: /var/log/kibana/
+chown -R kibana: /var/log/kibana/
 
 # Setup logrotate for Kibana
 cat > "/etc/logrotate.d/kibana" << EOF
@@ -390,7 +390,7 @@ apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--fo
 
 
 # Set up a curator old logs removal
-# flush everything that is older than 30 days
+# flush everything that is older than 14 days
 
 cat >> /opt/selks/delete-old-logs.sh <<EOF
 #!/bin/bash
