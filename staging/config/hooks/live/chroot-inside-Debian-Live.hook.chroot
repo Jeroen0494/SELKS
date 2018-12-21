@@ -236,9 +236,9 @@ cd Bro/staging
 find etc -type d -exec mkdir -p /'{}' \;
 find usr -type d -exec mkdir -p /'{}' \;
 find var -type d -exec mkdir -p /'{}' \;
-find etc -type f -exec cp -r --backup=numbered '{}' /'{}' \;
-find usr -type f -exec cp -r --backup=numbered '{}' /'{}' \;
-find var -type f -exec cp -r --backup=numbered '{}' /'{}' \;
+find etc -type f -exec cp -r '{}' /'{}' \;
+find usr -type f -exec cp -r '{}' /'{}' \;
+find var -type f -exec cp -r '{}' /'{}' \;
 
 # Update the log directory permissions
 chown -R logstash:logstash /var/log/bro/
@@ -264,37 +264,37 @@ cd /usr/src/securityonion-elastic
 git checkout Quintor
 
 # Copy configuration files into place
-cp -r --backup=numbered /usr/src/securityonion-elastic/configfiles/* /etc/logstash/conf.d/
+cp -r /usr/src/securityonion-elastic/configfiles/* /etc/logstash/conf.d/
 
 mkdir -p /etc/syslog-ng/conf.d/
-cp --backup=numbered /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/metrics-template.json
-cp --backup=numbered /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
+cp /usr/src/securityonion-elastic/etc/logstash/logstash-template.json /etc/logstash/metrics-template.json
+cp /usr/src/securityonion-elastic/etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/conf.d/01-bro.conf
 
 mkdir /opt/freq
-cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8502_postprocess_freq_analysis_bro_dns.conf /etc/logstash/conf.d/
-cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8503_postprocess_freq_analysis_bro_http.conf /etc/logstash/conf.d/
-cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8504_postprocess_freq_analysis_bro_ssl.conf /etc/logstash/conf.d/
-cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/8505_postprocess_freq_analysis_bro_x509.conf /etc/logstash/conf.d/
-cp -r --backup=numbered --no-target-directory /usr/src/securityonion-elastic/configfiles-setup_required/freq/ /opt/freq/
+cp /usr/src/securityonion-elastic/configfiles-setup_required/8502_postprocess_freq_analysis_bro_dns.conf /etc/logstash/conf.d/
+cp /usr/src/securityonion-elastic/configfiles-setup_required/8503_postprocess_freq_analysis_bro_http.conf /etc/logstash/conf.d/
+cp /usr/src/securityonion-elastic/configfiles-setup_required/8504_postprocess_freq_analysis_bro_ssl.conf /etc/logstash/conf.d/
+cp /usr/src/securityonion-elastic/configfiles-setup_required/8505_postprocess_freq_analysis_bro_x509.conf /etc/logstash/conf.d/
+cp -r --no-target-directory /usr/src/securityonion-elastic/configfiles-setup_required/freq/ /opt/freq/
 chmod 755 /opt/freq/freq.sh
-cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-dns.service /etc/systemd/system/
-cp --backup=numbered /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-http.service /etc/systemd/system/
+cp /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-dns.service /etc/systemd/system/
+cp /usr/src/securityonion-elastic/configfiles-setup_required/freq/freq-http.service /etc/systemd/system/
 rm /opt/freq/freq
 
 
 # Patch Logstash configuration files
 cd /etc/logstash/
-patch -b metrics-template.json /usr/src/securityonion-elastic/Quintor-patches/metrics-template.json.patch
+patch metrics-template.json /usr/src/securityonion-elastic/Quintor-patches/metrics-template.json.patch
 
 cd /etc/logstash/conf.d/
-patch -b 8999_postprocess_rename_type.conf /usr/src/securityonion-elastic/Quintor-patches/8999_postprocess_rename_type.conf.patch
-patch -b 9000_output_bro.conf /usr/src/securityonion-elastic/Quintor-patches/9000_output_bro.conf.patch
-patch -b 0007_input_import.conf /usr/src/securityonion-elastic/Quintor-patches/0007_input_import.conf.patch
+patch 8999_postprocess_rename_type.conf /usr/src/securityonion-elastic/Quintor-patches/8999_postprocess_rename_type.conf.patch
+patch 9000_output_bro.conf /usr/src/securityonion-elastic/Quintor-patches/9000_output_bro.conf.patch
+patch 0007_input_import.conf /usr/src/securityonion-elastic/Quintor-patches/0007_input_import.conf.patch
 mv 0007_input_import.conf 0007_input_import.conf.inactive
 
 
 # Patch SELKS Logstash configuration
-patch -b logstash.conf /usr/src/securityonion-elastic/Quintor-patches/logstash.conf.patch
+patch logstash.conf /usr/src/securityonion-elastic/Quintor-patches/logstash.conf.patch
 
 
 # Patch Kibana dashboards
@@ -302,11 +302,11 @@ cd /usr/src/securityonion-elastic/
 [ -d "kibana-Quintor" ] && rm -rf /usr/src/securityonion-elastic/kibana-Quintor
 cp -r --no-target-directory kibana kibana-Quintor
 cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards
-patch -b < /usr/src/securityonion-elastic/Quintor-patches/kibana-dashboards.patch
+patch < /usr/src/securityonion-elastic/Quintor-patches/kibana-dashboards.patch
 
 
 # Patch syslog-ng
-patch -b /etc/syslog-ng/conf.d/01-bro.conf /usr/src/securityonion-elastic/Quintor-patches/syslog-ng.conf.patch
+patch /etc/syslog-ng/conf.d/01-bro.conf /usr/src/securityonion-elastic/Quintor-patches/syslog-ng.conf.patch
 
 # Setup permissions
 chown -R logstash:logstash /etc/logstash
@@ -326,7 +326,7 @@ if [[ ${DEL} == [Yy]* ]]; then
     cd /usr/src/securityonion-elastic/kibana-Quintor/dashboards/
     for file in *.json
     do
-        echo "Loading dashboard $file:"
+        echo "Loading dashboard $file"
         curl -XPOST localhost:5601/api/kibana/dashboards/import?force=true -H 'kbn-xsrf:true' -H 'Content-type:application/json' -d @./$file \
             || exit 1
         echo
@@ -342,7 +342,8 @@ if [[ ${DEL} == [Yy]* ]]; then
     curl -X DELETE "localhost:9200/metrics-*"
     systemctl start logstash
     
-    # Setup Kibana logging and enable logrotate
+    echo -e "Done! Press ENTER to continue... \n"
+    read done
     
 else
     echo -e "\n Exiting..."
