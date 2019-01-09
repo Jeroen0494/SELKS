@@ -290,7 +290,7 @@ cd /etc/logstash/conf.d/
 patch 8999_postprocess_rename_type.conf /usr/src/securityonion-elastic/Quintor-patches/8999_postprocess_rename_type.conf.patch
 patch 9000_output_bro.conf /usr/src/securityonion-elastic/Quintor-patches/9000_output_bro.conf.patch
 patch 0007_input_import.conf /usr/src/securityonion-elastic/Quintor-patches/0007_input_import.conf.patch
-mv 0007_input_import.conf 0007_input_import.conf.inactive
+mv 0007_input_import.conf ~/0007_input_import.conf.inactive
 
 
 # Patch SELKS Logstash configuration
