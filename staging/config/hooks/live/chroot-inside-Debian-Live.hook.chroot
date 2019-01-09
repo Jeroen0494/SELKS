@@ -291,6 +291,10 @@ patch 8999_postprocess_rename_type.conf /usr/src/securityonion-elastic/Quintor-p
 patch 9000_output_bro.conf /usr/src/securityonion-elastic/Quintor-patches/9000_output_bro.conf.patch
 patch 0007_input_import.conf /usr/src/securityonion-elastic/Quintor-patches/0007_input_import.conf.patch
 mv 0007_input_import.conf ~/0007_input_import.conf.inactive
+patch 8502_postprocess_freq_analysis_bro_dns.conf /usr/src/securityonion-elastic/Quintor-patches/8502_postprocess_freq_analysis_bro_dns.conf.patch
+patch 8503_postprocess_freq_analysis_bro_http.conf /usr/src/securityonion-elastic/Quintor-patches/8503_postprocess_freq_analysis_bro_http.conf.patch
+patch 8504_postprocess_freq_analysis_bro_ssl.conf /usr/src/securityonion-elastic/Quintor-patches/8504_postprocess_freq_analysis_bro_ssl.conf.patch
+patch 8505_postprocess_freq_analysis_bro_x509.conf /usr/src/securityonion-elastic/Quintor-patches/8505_postprocess_freq_analysis_bro_x509.conf.patch
 
 
 # Patch SELKS Logstash configuration
